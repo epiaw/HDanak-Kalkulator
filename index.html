@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator HD Anak — KSO Nipro &amp; Fresenius</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#142328;
+  --ink-soft:#4d6066;
+  --bg:#f3f6f6;
+  --card:#ffffff;
+  --line:#dbe4e4;
+  --teal-900:#0c3a44;
+  --teal-700:#0f4c5c;
+  --teal-500:#157a8a;
+  --teal-300:#56b3bd;
+  --teal-100:#e3f2f3;
+  --amber:#b3741a;
+  --amber-bg:#fcf1de;
+  --red:#a8311f;
+  --red-bg:#fbe7e3;
+  --green:#1c7a4d;
+  --green-bg:#e3f4ea;
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Sora', sans-serif;
+  --body: 'Inter', sans-serif;
+  --radius: 14px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--body);
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{display:block;}
+
+/* ===== Header ===== */
+.topbar{
+  background:linear-gradient(135deg,var(--teal-900),var(--teal-700) 70%);
+  color:#fff;
+  padding:22px 20px 0;
+}
+.topbar-inner{max-width:1100px;margin:0 auto;}
+.brand-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.brand-mark{
+  width:46px;height:46px;border-radius:12px;
+  background:rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.brand-mark svg{width:26px;height:26px;}
+.brand-text h1{
+  font-family:var(--display);
+  font-size:1.32rem;
+  font-weight:700;
+  margin:0;
+  letter-spacing:-.01em;
+}
+.brand-text p{
+  margin:2px 0 0;
+  font-size:.83rem;
+  color:#bfe3e8;
+  font-weight:500;
+}
+.kso-pill{
+  margin-left:auto;
+  font-family:var(--mono);
+  font-size:.72rem;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.22);
+  padding:6px 11px;
+  border-radius:99px;
+  color:#d8f0f0;
+  white-space:nowrap;
+}
+.tabs{
+  max-width:1100px;margin:18px auto 0;
+  display:flex;gap:4px;overflow-x:auto;
+  border-bottom:1px solid rgba(255,255,255,.14);
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{
+  font-family:var(--body);
+  font-weight:600;
+  font-size:.85rem;
+  color:#a9c9cd;
+  background:transparent;
+  border:none;
+  padding:11px 16px;
+  cursor:pointer;
+  white-space:nowrap;
+  border-bottom:2.5px solid transparent;
+  transition:.15s;
+}
+.tab-btn:hover{color:#fff;}
+.tab-btn.active{color:#fff;border-bottom-color:#5fd3c4;}
+
+/* ===== Layout ===== */
+main{max-width:1100px;margin:0 auto;padding:24px 20px 80px;}
+.panel{display:none;}
+.panel.active{display:block;animation:fade .25s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+.section-title{
+  font-family:var(--display);
+  font-size:1.02rem;
+  font-weight:700;
+  color:var(--teal-900);
+  margin:30px 0 12px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title .badge{
+  font-family:var(--mono);
+  font-size:.68rem;
+  background:var(--teal-100);
+  color:var(--teal-700);
+  border-radius:6px;
+  padding:3px 7px;
+  font-weight:600;
+}
+.section-title:first-child{margin-top:0;}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media (max-width:680px){.grid2{grid-template-columns:1fr;}}
+
+.field{margin-bottom:0;}
+.field label{
+  display:block;font-size:.74rem;font-weight:600;
+  color:var(--ink-soft);margin-bottom:5px;
+  text-transform:uppercase;letter-spacing:.03em;
+}
+.field input, .field select{
+  width:100%;
+  font-family:var(--mono);
+  font-size:.95rem;
+  font-weight:600;
+  color:var(--ink);
+  background:var(--teal-100);
+  border:1.5px solid transparent;
+  border-radius:9px;
+  padding:10px 12px;
+  outline:none;
+  transition:.15s;
+}
+.field input[type="text"]{font-family:var(--body);font-weight:500;}
+.field input:focus, .field select:focus{border-color:var(--teal-500);background:#fff;}
+.field .hint{font-size:.72rem;color:var(--ink-soft);margin-top:4px;font-weight:400;text-transform:none;letter-spacing:0;}
+
+/* result rows */
+.result-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 18px;display:flex;flex-direction:column;gap:3px;
+  position:relative;overflow:hidden;
+}
+.result-card .lbl{font-size:.74rem;font-weight:600;color:var(--ink-soft);}
+.result-card .val{font-family:var(--mono);font-size:1.5rem;font-weight:700;color:var(--teal-900);}
+.result-card .unit{font-size:.78rem;font-weight:500;color:var(--ink-soft);}
+.result-card .note{font-size:.74rem;color:var(--ink-soft);margin-top:4px;line-height:1.4;}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+@media (max-width:780px){.result-grid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:480px){.result-grid{grid-template-columns:1fr;}}
+
+.status-strip{border-left:5px solid var(--teal-500);}
+.status-strip.aman{border-left-color:var(--green);}
+.status-strip.batas{border-left-color:var(--amber);}
+.status-strip.risiko{border-left-color:var(--red);}
+
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--body);font-size:.76rem;font-weight:700;
+  padding:4px 9px;border-radius:7px;margin-top:6px;width:fit-content;
+}
+.tag.aman{background:var(--green-bg);color:var(--green);}
+.tag.batas{background:var(--amber-bg);color:var(--amber);}
+.tag.risiko{background:var(--red-bg);color:var(--red);}
+
+/* table */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:#fff;}
+table{width:100%;border-collapse:collapse;font-size:.84rem;}
+table th{
+  background:var(--teal-700);color:#fff;text-align:left;
+  font-family:var(--body);font-weight:600;font-size:.76rem;
+  padding:10px 12px;white-space:nowrap;
+}
+table td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45;}
+table tr:last-child td{border-bottom:none;}
+table tr:nth-child(even) td{background:#fafcfc;}
+.num{font-family:var(--mono);font-weight:600;color:var(--teal-900);white-space:nowrap;}
+.muted{color:var(--ink-soft);}
+
+.kw{font-weight:700;}
+.flag-ok{color:var(--green);font-weight:700;}
+.flag-warn{color:var(--amber);font-weight:700;}
+.flag-bad{color:var(--red);font-weight:700;}
+
+.intro{
+  font-size:.86rem;color:var(--ink-soft);line-height:1.6;margin:0 0 18px;
+  background:var(--teal-100);border-radius:10px;padding:12px 14px;
+}
+.warn-box{
+  background:var(--amber-bg);border:1px solid #ecd2a3;border-radius:10px;
+  padding:12px 14px;font-size:.82rem;color:#7a5111;margin-bottom:18px;line-height:1.5;
+}
+
+/* buttons */
+.btn{
+  font-family:var(--body);font-weight:700;font-size:.85rem;
+  border:none;border-radius:9px;padding:11px 18px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;transition:.15s;
+}
+.btn-primary{background:var(--teal-700);color:#fff;}
+.btn-primary:hover{background:var(--teal-900);}
+.btn-ghost{background:transparent;color:var(--teal-700);border:1.5px solid var(--teal-300);}
+.btn-ghost:hover{background:var(--teal-100);}
+.btn-row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;}
+
+/* checklist */
+.chk-row{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);}
+.chk-row:last-child{border-bottom:none;}
+.chk-row input{width:19px;height:19px;margin-top:2px;accent-color:var(--teal-700);flex-shrink:0;}
+.chk-row .chk-text strong{display:block;font-size:.86rem;}
+.chk-row .chk-text span{font-size:.78rem;color:var(--ink-soft);}
+
+footer{
+  text-align:center;font-size:.76rem;color:var(--ink-soft);
+  padding:26px 20px 36px;
+}
+
+/* Ringkasan cetak (print) */
+#ringkasan-print{display:none;}
+@media print{
+  body *{visibility:hidden;}
+  #ringkasan-print, #ringkasan-print *{visibility:visible;}
+  #ringkasan-print{display:block;position:absolute;top:0;left:0;width:100%;padding:18px;}
+  .topbar,.tabs{display:none!important;}
+}
+.rp-head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid var(--teal-700);padding-bottom:10px;margin-bottom:14px;}
+.rp-head h2{font-family:var(--display);margin:0;color:var(--teal-900);font-size:1.1rem;}
+.rp-head p{margin:2px 0 0;font-size:.78rem;color:var(--ink-soft);}
+.rp-table{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:16px;}
+.rp-table td{padding:6px 8px;border-bottom:1px solid #e2e2e2;}
+.rp-table td:first-child{font-weight:600;color:var(--ink-soft);width:46%;}
+.rp-table td:last-child{font-family:var(--mono);font-weight:700;}
+
+.disclaimer{font-size:.74rem;color:var(--ink-soft);margin-top:6px;font-style:italic;}
+
+/* Signature pad */
+.sig-wrap{display:flex;gap:18px;flex-wrap:wrap;}
+.sig-block{flex:1;min-width:240px;}
+.sig-block label{display:block;font-size:.74rem;font-weight:600;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em;}
+.sig-canvas{
+  width:100%;height:120px;border:1.5px dashed var(--teal-300);border-radius:9px;
+  background:#fbfdfd;touch-action:none;cursor:crosshair;display:block;
+}
+.sig-actions{display:flex;gap:8px;margin-top:8px;}
+.sig-actions .btn{padding:7px 12px;font-size:.76rem;}
+.sig-status{font-size:.76rem;margin-top:6px;font-weight:600;}
+.sig-status.ok{color:var(--green);}
+.sig-status.empty{color:var(--ink-soft);font-weight:500;}
+.sig-preview{max-height:70px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:4px;}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-row">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C12 2 5 9.5 5 14.5C5 18.6 8.13 22 12 22C15.87 22 19 18.6 19 14.5C19 9.5 12 2 12 2Z" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M8.5 15.5C8.5 17.5 10 19 12 19" stroke="#5fd3c4" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Kalkulator HD Anak</h1>
+        <p>Sistem KSO 2 Vendor — Nipro &amp; Fresenius · KDOQI Pediatric &amp; ISPD 2023</p>
+      </div>
+      <div class="kso-pill">v1.0 · Hemodialisa Anak</div>
+    </div>
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="kalkulator">🧮 Kalkulator</button>
+      <button class="tab-btn" data-tab="panduan">📘 Panduan Klinis</button>
+      <button class="tab-btn" data-tab="referensi">📊 Referensi Cepat</button>
+      <button class="tab-btn" data-tab="monitoring">✅ Monitoring</button>
+      <button class="tab-btn" data-tab="riwayat">📁 Riwayat</button>
+      <button class="tab-btn" data-tab="pustaka">📚 Pustaka</button>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ TAB: KALKULATOR ============ -->
+  <section class="panel active" id="tab-kalkulator">
+    <div class="warn-box">⚠️ Kalkulator ini adalah <strong>alat bantu klinis</strong> berdasarkan KDOQI Pediatric &amp; ISPD 2023. Keputusan akhir peresepan HD tetap menjadi tanggung jawab dokter / tenaga medis terlatih di unit hemodialisa.</div>
+
+    <div class="section-title"><span class="badge">A</span> Data Input Pasien</div>
+    <div class="card">
+      <div class="grid2">
+        <div class="field"><label>Nama Pasien</label><input type="text" id="namaPasien" placeholder="Nama lengkap pasien"></div>
+        <div class="field"><label>No. RM / Medrek</label><input type="text" id="noRM" placeholder="Nomor rekam medis">
+          <div class="hint">Dipakai untuk cek duplikasi data riwayat pasien</div>
+        </div>
+        <div class="field"><label>Jenis Kelamin</label>
+          <select id="gender"><option value="L">L — Laki-laki</option><option value="P">P — Perempuan</option></select>
+        </div>
+        <div class="field"><label>Berat Badan (BB) Aktual — kg</label><input type="number" id="bbAktual" value="30" step="0.1"></div>
+        <div class="field"><label>Tinggi Badan (TB) — cm</label><input type="number" id="tb" value="135" step="0.1"></div>
+        <div class="field"><label>BB Kering (Dry Weight) Target — kg</label><input type="number" id="bbKering" value="28" step="0.1"></div>
+        <div class="field"><label>Usia Pasien — tahun</label><input type="number" id="usia" value="10" step="0.1"></div>
+        <div class="field"><label>Ureum Pra-HD (Pre-BUN) — mg/dL</label><input type="number" id="preBUN" value="150" step="1"></div>
+        <div class="field"><label>Ureum Pasca-HD (Post-BUN) — mg/dL</label><input type="number" id="postBUN" value="55" step="1"></div>
+        <div class="field"><label>Durasi Sesi HD (t) — jam</label><input type="number" id="durasi" value="4" step="0.25"></div>
+        <div class="field"><label>Frekuensi HD per Minggu — kali</label><input type="number" id="frekuensi" value="3" step="1"></div>
+        <div class="field"><label>Volume UF yang Ditarik — mL</label><input type="number" id="ufVol" value="1500" step="10"></div>
+        <div class="field"><label>Sesi ke- (1 = Inisiasi)</label><input type="number" id="sesiKe" value="5" step="1">
+          <div class="hint">Sesi 1–3 dianggap fase inisiasi (target URR &amp; Kt/V lebih rendah)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title"><span class="badge">B</span> Parameter Tubuh &amp; Batas Aman Sirkulasi Ekstrakorporal</div>
+    <div class="result-grid" id="grid-B"></div>
+
+    <div class="section-title"><span class="badge">C</span> Rekomendasi Qb &amp; UFR</div>
+    <div class="result-grid" id="grid-C"></div>
+
+    <div class="section-title"><span class="badge">D</span> Adekuasi Dialisis — URR &amp; Kt/V (Daugirdas Gen. 2)</div>
+    <div class="result-grid" id="grid-D"></div>
+
+    <div class="section-title"><span class="badge">E</span> Kesesuaian Paket KSO — Nipro &amp; Fresenius</div>
+    <p class="intro" style="margin-bottom:10px;">Vendor tidak boleh dicampur dalam satu sirkuit. Baris yang sesuai rentang BB pasien akan ditandai.</p>
+    <div class="tbl-wrap"><table id="tbl-E"></table></div>
+
+    <div class="section-title"><span class="badge">F</span> Rekomendasi Dosis Heparin &amp; Manitol</div>
+    <div class="result-grid" id="grid-F"></div>
+
+    <div class="section-title"><span class="badge">✎</span> Tanda Tangan Validasi</div>
+    <div class="card">
+      <div class="sig-wrap">
+        <div class="sig-block">
+          <label>Nama Perawat / Petugas</label>
+          <input type="text" id="namaPerawat" placeholder="Nama perawat yang melakukan input" style="margin-bottom:10px;">
+          <label>Tanda Tangan Perawat / Petugas (untuk data ini)</label>
+          <canvas class="sig-canvas" id="sigPerawat" width="600" height="160"></canvas>
+          <div class="sig-actions">
+            <button class="btn btn-ghost" id="btn-clear-perawat">🧹 Hapus</button>
+          </div>
+          <div class="sig-status empty" id="status-sig-perawat">Belum ditandatangani</div>
+        </div>
+        <div class="sig-block">
+          <label>Tanda Tangan Peneliti / Penanggung Jawab</label>
+          <div id="peneliti-preview-wrap" style="height:120px;display:flex;align-items:center;border:1.5px dashed var(--line);border-radius:9px;background:#fbfdfd;padding:6px;">
+            <span class="muted" style="font-size:.82rem;" id="peneliti-empty-msg">Belum diatur — buka tab <strong>Riwayat</strong> untuk mengatur tanda tangan ini sekali, akan otomatis dipakai di semua data.</span>
+          </div>
+          <div class="sig-status" id="status-sig-peneliti"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title"><span class="badge">G</span> Ringkasan Peresepan</div>
+    <div class="card" id="ringkasan-view"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak / Simpan PDF Ringkasan</button>
+      <button class="btn btn-ghost" id="btn-save-sheet">☁️ Simpan ke Riwayat (Google Sheets)</button>
+      <button class="btn btn-ghost" id="btn-reset">↺ Reset ke Contoh Awal</button>
+    </div>
+    <p class="disclaimer" id="save-status"></p>
+  </section>
+
+  <!-- ============ TAB: PANDUAN KLINIS ============ -->
+  <section class="panel" id="tab-panduan">
+    <div class="section-title">1. Prinsip Utama Parameter Ekstrakorporal pada Anak</div>
+    <div class="tbl-wrap"><table id="t-prinsip"></table></div>
+
+    <div class="section-title">2. Spesifikasi Konsumabel KSO — Nipro &amp; Fresenius</div>
+    <p class="intro" style="margin-bottom:10px;">⚠️ Tidak boleh dicampur antar vendor dalam satu sirkuit.</p>
+    <div class="tbl-wrap"><table id="t-konsumabel"></table></div>
+
+    <div class="section-title">3. Protokol Inisiasi HD &amp; Pencegahan DDS</div>
+    <div class="tbl-wrap"><table id="t-inisiasi"></table></div>
+
+    <div class="section-title">4. Adekuasi Dialisis — Parameter &amp; Target (KDOQI 2023)</div>
+    <div class="tbl-wrap"><table id="t-adekuasi"></table></div>
+
+    <div class="section-title">5. Heparinisasi &amp; Antikoagulasi pada Anak</div>
+    <div class="tbl-wrap"><table id="t-heparin"></table></div>
+
+    <div class="section-title">6. Manajemen Komplikasi Intradialitik pada Anak</div>
+    <div class="tbl-wrap"><table id="t-komplikasi"></table></div>
+  </section>
+
+  <!-- ============ TAB: REFERENSI CEPAT ============ -->
+  <section class="panel" id="tab-referensi">
+    <div class="section-title">Tabel Referensi Cepat — Parameter HD Anak Berdasarkan Berat Badan</div>
+    <p class="intro">Berdasarkan panduan KDOQI Pediatric 2023 &amp; Ikatan Nefrologi Anak Indonesia (IDAI).</p>
+    <div class="tbl-wrap"><table id="t-ref1"></table></div>
+
+    <div class="section-title">Pemilihan Dializer per Rentang Berat Badan</div>
+    <div class="tbl-wrap"><table id="t-ref2"></table></div>
+
+    <div class="section-title">Ringkasan Target Adekuasi</div>
+    <div class="tbl-wrap"><table id="t-ref3"></table></div>
+  </section>
+
+  <!-- ============ TAB: MONITORING ============ -->
+  <section class="panel" id="tab-monitoring">
+    <div class="section-title">Checklist Pre-HD</div>
+    <div class="card" id="chk-pre"></div>
+
+    <div class="section-title">Monitoring Intradialitik (Setiap 30 Menit)</div>
+    <div class="tbl-wrap"><table id="t-intra"></table></div>
+
+    <div class="section-title">Checklist Post-HD</div>
+    <div class="card" id="chk-post"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="btn-reset-chk">↺ Reset Checklist</button>
+    </div>
+    <p class="disclaimer">Status checklist disimpan secara lokal di perangkat ini (tidak terhubung ke server) — gunakan sebagai alat bantu pemantauan per sesi.</p>
+  </section>
+
+  <!-- ============ TAB: RIWAYAT (Google Sheets) ============ -->
+  <section class="panel" id="tab-riwayat">
+    <div class="section-title">Koneksi Google Sheets</div>
+    <div class="card">
+      <div class="field" style="margin-bottom:12px;">
+        <label>URL Web App (Google Apps Script)</label>
+        <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/XXXXXXXX/exec">
+        <div class="hint">Tempel URL deployment Apps Script di sini sekali saja — tersimpan otomatis di browser ini. Lihat panduan setup di bawah jika belum membuatnya.</div>
+      </div>
+      <div class="btn-row" style="margin-top:0;">
+        <button class="btn btn-primary" id="btn-save-url">Simpan URL</button>
+        <button class="btn btn-ghost" id="btn-refresh-riwayat">↻ Muat Ulang Riwayat</button>
+      </div>
+    </div>
+
+    <div class="section-title">Tanda Tangan Peneliti / Penanggung Jawab</div>
+    <div class="card" style="margin-bottom:14px;">
+      <p style="font-size:.83rem;color:var(--ink-soft);margin-top:0;">Atur sekali — tanda tangan ini akan otomatis diterapkan ke <strong>setiap</strong> data yang disimpan ke riwayat dari perangkat ini.</p>
+      <div class="sig-block" style="max-width:420px;">
+        <canvas class="sig-canvas" id="sigPeneliti" width="600" height="160"></canvas>
+        <div class="sig-actions">
+          <button class="btn btn-ghost" id="btn-clear-peneliti-pad">🧹 Hapus Coretan</button>
+          <button class="btn btn-primary" id="btn-save-peneliti">💾 Simpan Tanda Tangan</button>
+        </div>
+        <div class="sig-status" id="status-peneliti-setup"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Daftar Riwayat Perhitungan</div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="field"><label>Cari nama pasien</label><input type="text" id="searchRiwayat" placeholder="Ketik nama pasien..."></div>
+    </div>
+    <div class="tbl-wrap"><table id="t-riwayat"><thead><tr><th>Tanggal</th><th>No. RM</th><th>Nama</th><th>BB/Usia</th><th>UFR</th><th>URR</th><th>Kt/V</th><th>Perawat</th><th>Aksi</th></tr></thead><tbody><tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">Belum ada koneksi / data. Masukkan URL Apps Script di atas.</td></tr></tbody></table></div>
+
+    <div class="section-title">📖 Panduan Setup Backend (Google Apps Script)</div>
+    <div class="card">
+      <p style="font-size:.85rem;line-height:1.6;margin-top:0;">Ikuti langkah ini sekali saja agar riwayat perhitungan tersimpan terpusat di Google Sheets (bisa diakses dari banyak perangkat):</p>
+      <ol style="font-size:.85rem;line-height:1.8;padding-left:20px;">
+        <li>Buat <strong>Google Sheets baru</strong>, beri nama misalnya <em>"Riwayat HD Anak"</em>.</li>
+        <li>Buka menu <strong>Extensions → Apps Script</strong>.</li>
+        <li>Hapus kode default, lalu salin-tempel seluruh isi file <code>Code.gs</code> yang disertakan (lihat file terpisah).</li>
+        <li>Klik <strong>Deploy → New deployment → Web app</strong>.</li>
+        <li>Pada "Execute as" pilih <strong>Me</strong>, pada "Who has access" pilih <strong>Anyone</strong>, lalu klik Deploy.</li>
+        <li>Izinkan akses (Authorize access) saat diminta.</li>
+        <li>Salin <strong>URL Web App</strong> yang muncul, tempel ke kolom "URL Web App" di atas, klik Simpan URL.</li>
+      </ol>
+      <p class="disclaimer">Sheet akan otomatis dibuatkan header kolom saat data pertama disimpan.</p>
+    </div>
+  </section>
+
+  <!-- ============ TAB: PUSTAKA ============ -->
+  <section class="panel" id="tab-pustaka">
+    <div class="section-title">Referensi Pustaka &amp; Panduan Klinis yang Digunakan</div>
+    <div class="tbl-wrap"><table id="t-pustaka"></table></div>
+  </section>
+
+</main>
+
+<!-- Hidden printable ringkasan -->
+<div id="ringkasan-print"></div>
+
+<footer>
+  Kalkulator HD Anak — Sistem KSO Nipro &amp; Fresenius · Disusun untuk Instalasi Hemodialisa · Alat bantu klinis, bukan pengganti penilaian medis langsung.
+</footer>
+
+<script>
+/* ===================== TAB SWITCHING ===================== */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ===================== HELPERS ===================== */
+const $=id=>document.getElementById(id);
+const fmt=(n,d=1)=> isFinite(n) ? n.toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d}) : '—';
+function resultCard(lbl,val,unit,note,statusClass){
+  return `<div class="result-card ${statusClass?('status-strip '+statusClass):''}">
+    <div class="lbl">${lbl}</div>
+    <div class="val">${val}<span class="unit"> ${unit||''}</span></div>
+    ${note?`<div class="note">${note}</div>`:''}
+  </div>`;
+}
+function tag(cls,text){return `<span class="tag ${cls}">${text}</span>`;}
+
+/* ===================== CORE CALCULATION ===================== */
+function ebvPerKg(usia){
+  // Bayi (≤1 th): 78 mL/kg | Anak (1–12 th): 72 mL/kg | Remaja (>12 th): 68 mL/kg
+  if(usia<=1) return 78;
+  if(usia<=12) return 72;
+  return 68;
+}
+
+function calculate(){
+  const namaPasien = $('namaPasien').value || '(belum diisi)';
+  const gender = $('gender').value;
+  const bbAktual = parseFloat($('bbAktual').value)||0;
+  const tb = parseFloat($('tb').value)||0;
+  const bbKering = parseFloat($('bbKering').value)||0;
+  const usia = parseFloat($('usia').value)||0;
+  const preBUN = parseFloat($('preBUN').value)||0;
+  const postBUN = parseFloat($('postBUN').value)||0;
+  const durasi = parseFloat($('durasi').value)||0;
+  const frekuensi = parseFloat($('frekuensi').value)||0;
+  const ufVol = parseFloat($('ufVol').value)||0;
+  const sesiKe = parseFloat($('sesiKe').value)||1;
+
+  // --- B. Body params ---
+  const bsa = Math.sqrt((bbAktual*tb)/3600);
+  const ebvKg = ebvPerKg(usia);
+  const ebv = bbAktual*ebvKg;
+  const ebv10 = ebv*0.10;
+  const kelebihanCairanKg = bbAktual-bbKering;
+  const kelebihanCairanPct = bbKering>0 ? (kelebihanCairanKg/bbKering)*100 : 0;
+
+  // --- C. Qb & UFR ---
+  const qbInisiasi = bbAktual*2.5;
+  const qbRutinMin = bbAktual*4;
+  const qbRutinMax = bbAktual*6;
+  const ufrAktual = (durasi>0 && bbAktual>0) ? (ufVol/durasi/bbAktual) : 0;
+  let ufrStatusCls='aman', ufrStatusTxt='✅ AMAN';
+  if(ufrAktual>13){ufrStatusCls='risiko';ufrStatusTxt='🚨 RISIKO TINGGI — turunkan UFR segera';}
+  else if(ufrAktual>10){ufrStatusCls='batas';ufrStatusTxt='⚠ BATAS TOLERANSI — awasi ketat';}
+  const ufrMaksAman = 10*bbAktual*durasi;
+
+  // --- D. Adequacy: URR & Kt/V Daugirdas gen.2 ---
+  const R = preBUN>0 ? (postBUN/preBUN) : 0;
+  const urr = (1-R)*100;
+  const isInisiasi = sesiKe<=3;
+  let urrStatusCls, urrStatusTxt;
+  if(isInisiasi){
+    if(urr>=30 && urr<=40){urrStatusCls='aman';urrStatusTxt='✅ Sesuai target inisiasi (30–40%)';}
+    else if(urr>40){urrStatusCls='batas';urrStatusTxt='⚠ Melebihi target inisiasi — risiko DDS';}
+    else {urrStatusCls='batas';urrStatusTxt='⚠ Di bawah target inisiasi';}
+  } else {
+    if(urr>=65){urrStatusCls='aman';urrStatusTxt='✅ ADEKUAT (≥65%)';}
+    else {urrStatusCls='risiko';urrStatusTxt='🚨 TIDAK ADEKUAT (<65%)';}
+  }
+
+  const bbPascaHD = bbAktual-(ufVol/1000);
+  const lnArg = R-0.008*durasi;
+  let ktv=0;
+  if(lnArg>0 && bbPascaHD>0){
+    ktv = -Math.log(lnArg) + (4-3.5*R)*((ufVol/1000)/bbPascaHD);
+  }
+  let ktvCls,ktvTxt;
+  if(ktv>=1.4){ktvCls='aman';ktvTxt='✅ OPTIMAL (≥1,4)';}
+  else if(ktv>=1.2){ktvCls='batas';ktvTxt='〜 CUKUP (1,2–1,4)';}
+  else {ktvCls='risiko';ktvTxt='🚨 TIDAK ADEKUAT (<1,2) — audit segera';}
+
+  const ektv = ktv*frekuensi;
+  const vDist = (gender==='L'?0.58:0.50)*bbAktual;
+
+  // --- F. Heparin & manitol ---
+  const hepBolusMin = 25*bbAktual;
+  const hepBolusMax = 50*bbAktual;
+  const hepMaintMin = 10*bbAktual;
+  const hepMaintStd = 20*bbAktual;
+  const manitolNeeded = preBUN>=150;
+  const manitolDosis = 0.5*bbAktual;
+
+  return {namaPasien,gender,bbAktual,tb,bbKering,usia,preBUN,postBUN,durasi,frekuensi,ufVol,sesiKe,
+    bsa,ebvKg,ebv,ebv10,kelebihanCairanKg,kelebihanCairanPct,
+    qbInisiasi,qbRutinMin,qbRutinMax,ufrAktual,ufrStatusCls,ufrStatusTxt,ufrMaksAman,
+    R,urr,isInisiasi,urrStatusCls,urrStatusTxt,ktv,ktvCls,ktvTxt,ektv,vDist,
+    hepBolusMin,hepBolusMax,hepMaintMin,hepMaintStd,manitolNeeded,manitolDosis};
+}
+
+/* ===================== DIALYZER TABLE (Section E) ===================== */
+const dializerData=[
+  {vendor:'NIPRO',model:'Elisio 110H',vol:58,bl:140,range:[15,25],note:'Pilihan untuk anak usia sekolah kecil.'},
+  {vendor:'NIPRO',model:'Elisio 13H',vol:76,bl:140,range:[25,40],note:'Pilihan utama Nipro anak besar/remaja awal.'},
+  {vendor:'NIPRO',model:'Elisio 15H',vol:88,bl:140,range:[40,999],note:'Hanya untuk remaja besar mendekati berat dewasa.'},
+  {vendor:'FRESENIUS',model:'F7',vol:82,bl:145,range:[25,40],note:'Pilihan utama Fresenius anak besar/remaja awal.'},
+  {vendor:'FRESENIUS',model:'F8',vol:112,bl:145,range:[40,55],note:'⚠ Hanya dipertimbangkan untuk remaja besar dengan pemantauan ketat.'},
+  {vendor:'FRESENIUS',model:'FX80',vol:113,bl:145,range:[999,99999],note:'🚫 KONTRAINDIKASI pada anak — khusus dewasa besar.'},
+];
+
+function renderDializerTable(calc){
+  const rows = dializerData.map(d=>{
+    const total = d.vol+d.bl;
+    const pctEBV = calc.ebv>0 ? (total/calc.ebv*100) : 0;
+    let statusCls,statusTxt;
+    if(pctEBV<10){statusCls='flag-ok';statusTxt='✅ Aman tanpa priming darah';}
+    else if(pctEBV<=15){statusCls='flag-warn';statusTxt='⚠ Wajib priming koloid/albumin';}
+    else {statusCls='flag-bad';statusTxt='🚨 Wajib priming PRC donor';}
+    const inRange = calc.bbAktual>=d.range[0] && calc.bbAktual<d.range[1];
+    return `<tr style="${inRange?'background:var(--teal-100);':''}">
+      <td><span class="kw">${d.vendor}</span></td>
+      <td>${d.model}${inRange?' <span class="tag aman" style="margin-top:0;">BB sesuai</span>':''}</td>
+      <td class="num">${d.vol} mL</td>
+      <td class="num">${d.bl} mL</td>
+      <td class="num">${total} mL</td>
+      <td class="num">${fmt(pctEBV,1)}%</td>
+      <td class="${statusCls}">${statusTxt}</td>
+      <td class="muted">${d.note}</td>
+    </tr>`;
+  }).join('');
+  return `<thead><tr><th>Vendor</th><th>Model Dializer</th><th>Vol. Dializer</th><th>Vol. BL (dewasa, est.)</th><th>Total Vol. Sirkuit</th><th>% EBV Pasien</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+/* ===================== RENDER MAIN CALCULATOR ===================== */
+function render(){
+  const c = calculate();
+
+  $('grid-B').innerHTML = [
+    resultCard('Luas Permukaan Tubuh (BSA) — Mosteller', fmt(c.bsa,2), 'm²','BSA = √(BB×TB/3600)'),
+    resultCard('Estimated Blood Volume (EBV)', fmt(c.ebv,0), 'mL', `${c.ebvKg} mL/kgBB sesuai kategori usia`),
+    resultCard('Batas Aman Volume Sirkuit (10% EBV)', fmt(c.ebv10,0), 'mL','Vol. dializer + BL tidak boleh melebihi ini tanpa priming darah'),
+    resultCard('Kelebihan Cairan (BB Aktual − BB Kering)', fmt(c.kelebihanCairanKg,2), 'kg'),
+    resultCard('Kelebihan Cairan (% dari BB Kering)', fmt(c.kelebihanCairanPct,2), '%',
+      c.kelebihanCairanPct>5?'⚠ &gt;5% — pertimbangkan tambahan sesi / perpanjang durasi':'Dalam batas wajar (≤5%)',
+      c.kelebihanCairanPct>5?'batas':'aman'),
+  ].join('');
+
+  $('grid-C').innerHTML = [
+    resultCard('Qb — Sesi Inisiasi (2,5 mL/kg/mnt)', fmt(c.qbInisiasi,0), 'mL/mnt','Mulai dari 2 mL/kg/mnt, titrasi naik tiap 15 mnt jika toleransi baik'),
+    resultCard('Qb — Sesi Rutin Minimum (4 mL/kg/mnt)', fmt(c.qbRutinMin,0), 'mL/mnt'),
+    resultCard('Qb — Sesi Rutin Maksimum (6 mL/kg/mnt)', fmt(c.qbRutinMax,0), 'mL/mnt','Jangan melebihi 200–250 mL/mnt'),
+    resultCard('UFR Aktual', fmt(c.ufrAktual,2), 'mL/kg/jam', c.ufrStatusTxt, c.ufrStatusCls)+'',
+    resultCard('Batas Maksimal Aman UF (10 mL/kg/jam)', fmt(c.ufrMaksAman,0), 'mL','Volume UF maksimal pada durasi sesi ini'),
+  ].join('');
+
+  $('grid-D').innerHTML = [
+    resultCard('Rasio Ureum (R = Post/Pre)', fmt(c.R,3), ''),
+    resultCard('URR — Urea Reduction Ratio', fmt(c.urr,1), '%', c.urrStatusTxt + (c.isInisiasi?' · fase inisiasi':' · fase rutin'), c.urrStatusCls),
+    resultCard('Kt/V — Daugirdas Generasi 2', fmt(c.ktv,3), '', c.ktvTxt, c.ktvCls),
+    resultCard('eKt/V Mingguan (Kt/V × Frekuensi)', fmt(c.ektv,2), '', c.ektv>=3.6?'✅ Memenuhi target ≥3,6 (3×/minggu)':'⚠ Di bawah target — evaluasi frekuensi/dosis', c.ektv>=3.6?'aman':'batas'),
+    resultCard('Volume Distribusi Urea (V) — estimasi Watson', fmt(c.vDist,2), 'L', c.gender==='L'?'58% × BB (laki-laki)':'50% × BB (perempuan)'),
+  ].join('');
+
+  $('tbl-E').innerHTML = renderDializerTable(c);
+
+  $('grid-F').innerHTML = [
+    resultCard('Heparin Bolus Awal (25 IU/kg)', fmt(c.hepBolusMin,0), 'IU','Dosis minimum standar'),
+    resultCard('Heparin Bolus Awal (50 IU/kg)', fmt(c.hepBolusMax,0), 'IU','Dosis maksimum jika risiko clotting tinggi'),
+    resultCard('Heparin Maintenance (10 IU/kg/jam)', fmt(c.hepMaintMin,0), 'IU/jam','Dosis minimum, risiko perdarahan sedang'),
+    resultCard('Heparin Maintenance (20 IU/kg/jam)', fmt(c.hepMaintStd,0), 'IU/jam','Dosis standar via syringe pump, target aPTT 1,5–2× normal'),
+    resultCard('Manitol Profilaksis (0,5 g/kg)', c.manitolNeeded?fmt(c.manitolDosis,1):'—', c.manitolNeeded?'gram':'',
+      c.manitolNeeded?'⚠ BUN ≥150 mg/dL — pertimbangkan infus 20% selama 60 menit sebelum HD':'Tidak diperlukan (BUN <150 mg/dL)',
+      c.manitolNeeded?'batas':null),
+  ].join('');
+
+  // Ringkasan G
+  const ringkasanRows = [
+    ['Nama Pasien', c.namaPasien],
+    ['BB / TB / Usia', `${fmt(c.bbAktual,1)} kg  /  ${fmt(c.tb,1)} cm  /  ${fmt(c.usia,1)} th`],
+    ['BSA (Mosteller)', `${fmt(c.bsa,2)} m²`],
+    ['EBV / Batas 10% EBV', `${fmt(c.ebv,0)} mL  /  ${fmt(c.ebv10,0)} mL`],
+    ['Qb Inisiasi', `${fmt(c.qbInisiasi,0)} mL/mnt`],
+    ['Qb Rutin (min–maks)', `${fmt(c.qbRutinMin,0)} – ${fmt(c.qbRutinMax,0)} mL/mnt`],
+    ['UFR Aktual / Status', `${fmt(c.ufrAktual,2)} mL/kg/jam — ${c.ufrStatusTxt}`],
+    ['Batas Maks UF (10 mL/kg/jam)', `${fmt(c.ufrMaksAman,0)} mL`],
+    ['URR / Status', `${fmt(c.urr,1)}% — ${c.urrStatusTxt}`],
+    ['Kt/V (Daugirdas Gen.2) / Status', `${fmt(c.ktv,3)} — ${c.ktvTxt}`],
+    ['eKt/V Mingguan', `${fmt(c.ektv,2)} (target ≥3,6 untuk 3×/mgg)`],
+    ['Heparin Bolus (standar)', `${fmt(c.hepBolusMin,0)} IU (25 IU/kg)`],
+    ['Heparin Maintenance (standar)', `${fmt(c.hepMaintStd,0)} IU/jam (20 IU/kg/jam)`],
+    ['Manitol Profilaksis', c.manitolNeeded?`${fmt(c.manitolDosis,1)} gram (BUN ≥150)`:'Tidak diperlukan'],
+  ];
+  $('ringkasan-view').innerHTML = `<table>${ringkasanRows.map(r=>`<tr><td style="font-weight:600;color:var(--ink-soft);width:46%;">${r[0]}</td><td class="num">${r[1]}</td></tr>`).join('')}</table>`;
+
+  $('ringkasan-print').innerHTML = `
+    <div class="rp-head">
+      <div><h2>Ringkasan Peresepan Hemodialisis Anak</h2><p>Sistem KSO Nipro &amp; Fresenius · KDOQI Pediatric 2023</p></div>
+      <p>Tanggal cetak: ${new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'})}</p>
+    </div>
+    <table class="rp-table">${ringkasanRows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>
+    <p class="disclaimer">Dokumen ini dihasilkan oleh alat bantu klinis. Keputusan akhir peresepan HD tetap menjadi tanggung jawab dokter / tenaga medis terlatih.</p>
+  `;
+}
+
+['namaPasien','gender','bbAktual','tb','bbKering','usia','preBUN','postBUN','durasi','frekuensi','ufVol','sesiKe']
+  .forEach(id=> $(id).addEventListener('input', render));
+
+$('btn-reset').addEventListener('click',()=>{
+  const defaults={namaPasien:'',gender:'L',bbAktual:30,tb:135,bbKering:28,usia:10,preBUN:150,postBUN:55,durasi:4,frekuensi:3,ufVol:1500,sesiKe:5};
+  Object.entries(defaults).forEach(([k,v])=> $(k).value=v);
+  render();
+});
+
+render();
+
+/* ===================== STATIC TABLES: PANDUAN KLINIS ===================== */
+function buildTable(elId, headers, rows){
+  $(elId).innerHTML = `<thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${
+    rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')
+  }</tbody>`;
+}
+
+buildTable('t-prinsip',
+  ['Parameter','Nilai / Rumus Klinis','Keterangan & Dasar Klinis','Catatan Kritis'],
+  [
+    ['Estimated Blood Volume (EBV)','Neonatus: 85–90 mL/kgBB<br>Bayi (&lt;1 th): 75–80 mL/kgBB<br>Anak (1–12 th): 70–75 mL/kgBB<br>Remaja: 65–70 mL/kgBB','Volume total darah dalam sirkulasi. Acuan utama keamanan volume sirkuit ekstrakorporal agar tidak memicu syok hipovolemik.','Gunakan BB aktual (bukan BB kering) untuk estimasi awal.'],
+    ['Volume Sirkuit Ekstrakorporal (Dializer + Blood Line)','&lt;10% EBV → AMAN tanpa priming darah<br>10–15% EBV → WAJIB priming koloid/albumin<br>&gt;15% EBV → WAJIB priming PRC donor','Volume total = Priming Vol. Dializer + Priming Vol. Blood Line.','Hitung tiap kali ganti ukuran dializer atau BL.'],
+    ['Qb — Sesi Rutin','4–6 mL/kgBB/menit<br>Qb min: 50 mL/mnt (mesin)<br>Qb maks praktis anak: 200 mL/mnt','Range aman untuk optimasi klirens tanpa stres kardiovaskular berlebih.','Monitor TD tiap 30 mnt; turunkan Qb jika TD turun &gt;20 mmHg.'],
+    ['Qb — Sesi Inisiasi / Pertama','2–3 mL/kgBB/menit (≈50% dari target rutin)','Mencegah Dialysis Disequilibrium Syndrome (DDS) pada sesi pertama.','Tingkatkan bertahap: inisiasi → sesi ke-3 baru capai Qb rutin.'],
+    ['Qd — Kecepatan Aliran Dialisat','300–500 mL/menit standar','Rasio Qd:Qb idealnya ≥1,5:1 untuk saturasi dialisat.','Pastikan suhu dialisat 36–37°C.'],
+    ['Ultrafiltration Rate (UFR)','≤10 mL/kgBB/jam (aman)<br>≤13 mL/kgBB/jam (batas toleransi)<br>&gt;13 mL/kgBB/jam → RISIKO TINGGI','UFR berlebih adalah penyebab utama IDH.','UFR = Total UF target ÷ durasi sesi.'],
+    ['Target Penarikan Cairan Total','Rutin: 3–5% BB kering<br>Maksimal aman: 5% BB kering','Penarikan &gt;5% BB per sesi meningkatkan risiko IDH dan kram otot.','Jika UF &gt;5% BB, tambah sesi / perpanjang durasi.'],
+    ['Luas Permukaan Tubuh (BSA)','Mosteller: √(TB×BB/3600)<br>DuBois: 0,007184×TB^0,725×BB^0,425','Untuk normalisasi dosis dialisis dan pemilihan dializer.','Mosteller lebih praktis; DuBois lebih akurat untuk anak sangat kecil.'],
+  ]);
+
+buildTable('t-konsumabel',
+  ['Vendor','Model Dializer','Luas Membran (m²)','Priming Dializer (mL)','Rekomendasi & Batas BB'],
+  [
+    ['NIPRO','Elisio 110H','1.0','58','BB 15–25 kg. Cek % EBV sebelum pakai.'],
+    ['NIPRO','Elisio 13H','1.3','76','BB 25–40 kg. Aman jika BB ≥28 kg.'],
+    ['NIPRO','Elisio 15H','1.5','88','BB ≥40 kg. Remaja besar mendekati dewasa.'],
+    ['FRESENIUS','F7','1.3','82','BB 25–40 kg.'],
+    ['FRESENIUS','F8','1.8','112','⚠ Tidak disarankan untuk anak. Khusus dewasa.'],
+    ['FRESENIUS','FX80','1.8','113','🚫 Kontraindikasi pada anak.'],
+  ]);
+
+buildTable('t-inisiasi',
+  ['Parameter','Target / Batasan','Rasional Klinis','Intervensi Jika Terlampau'],
+  [
+    ['Durasi Sesi Pertama (HD-1)','1,5–2 jam','Membatasi kecepatan penurunan ureum.','BUN &gt;200 → pertimbangkan CRRT/HD intermiten 2 jam/hari.'],
+    ['Target URR Sesi Pertama','30–40%','Penurunan &gt;40% → risiko DDS tinggi.','Hentikan/perpendek sesi jika gejala DDS muncul.'],
+    ['Qb Sesi Inisiasi','2–3 mL/kgBB/menit','Klirens terkendali dalam batas aman.','Naik 0,5 mL/kg/mnt tiap 15–20 menit jika toleransi baik.'],
+    ['Profilaksis Manitol (BUN ≥150)','0,5–1 g/kgBB i.v., infus 1 jam sebelum HD','Mengurangi perpindahan cairan ke otak.','Kontraindikasi jika anurik total.'],
+    ['Pemantauan DDS Intradialitik','Tiap 30 menit: TD, GCS, nyeri kepala','DDS dapat muncul 4–8 jam pasca HD.','Hentikan HD segera bila GCS turun/kejang.'],
+    ['Eskalasi Sesi 2 dst.','Sesi-2: 2–2,5 jam; Sesi-3: 3 jam; Sesi-4: target penuh','Adaptasi kardiovaskular & otak bertahap.','Bila stabil, percepat eskalasi dengan pemantauan ketat.'],
+  ]);
+
+buildTable('t-adekuasi',
+  ['Parameter','Rumus','Target Minimum','Interpretasi & Tindakan'],
+  [
+    ['URR','(1 − Post/Pre) × 100','Rutin ≥65% · Inisiasi 30–40%','&lt;65% → evaluasi durasi, Qb, atau dializer.'],
+    ['Kt/V Daugirdas Gen.2','−ln(R−0,008t) + (4−3,5R)×UF/BB','≥1,2 (min) · ≥1,4 (optimal)','&lt;1,2 → audit akses, resirkulasi, durasi efektif.'],
+    ['eKt/V Mingguan','Kt/V per sesi × frekuensi','≥3,6 (3×/minggu)','2×/minggu → Kt/V per sesi harus ≥1,8.'],
+    ['Standar Weekly Kt/V (spKt/V)','Kt/V × frekuensi (KDOQI 2006)','≥2,1','Untuk membandingkan modalitas dialisis.'],
+    ['Volume Distribusi Urea (V)','58% BB (L) · 50% BB (P) — Watson','—','V tidak akurat → Kt/V semu, terutama pada edema masif.'],
+  ]);
+
+buildTable('t-heparin',
+  ['Metode','Dosis / Protokol','Indikasi','Kontraindikasi / Perhatian'],
+  [
+    ['Heparin Sistemik Standar','Bolus 25–50 IU/kg; Maintenance 10–25 IU/kg/jam; target aPTT 1,5–2×','Protokol standar tanpa risiko perdarahan.','HIT, post-op &lt;48 jam, perdarahan aktif GI, trauma kepala.'],
+    ['Heparin Minimal','Bolus 10–15 IU/kg; Maintenance 50% dosis standar; aPTT 1,0–1,3×','Risiko perdarahan sedang.','Monitoring aPTT tiap sesi; siapkan saline flush.'],
+    ['Heparin Bebas (No-Heparin)','Flush saline 100–200 mL tiap 15–30 mnt; Qb naik 10–20%','Perdarahan aktif, trombositopenia berat.','Risiko clotting tinggi; sesi ≤3 jam.'],
+    ['Sitrat Regional (RCA)','Sitrat 4% jalur arteri; target iCa sirkuit 0,25–0,35 mmol/L','HIT, risiko perdarahan tinggi, situasi kritis (CRRT/SLED).','Memerlukan mesin & protokol khusus; risiko hipokalsemia.'],
+  ]);
+
+buildTable('t-komplikasi',
+  ['Komplikasi','Definisi / Ambang','Tatalaksana Segera','Pencegahan'],
+  [
+    ['Hipotensi Intradialitik (IDH)','TD sistol turun &gt;20 mmHg atau &lt;80 mmHg (anak), &lt;70 mmHg (bayi)','Trendelenburg, stop/kurangi UFR, bolus saline 10–20 mL/kg, albumin/PRC bila perlu.','UFR ≤10 mL/kg/jam, profil UF step-down, koreksi anemia.'],
+    ['Kram Otot','Kontraksi involunter, umumnya akhir sesi / UFR tinggi.','Kurangi UFR, bolus saline 5–10 mL/kg, stretching, saline hipertonik bila berat.','Evaluasi BB kering, UFR lambat & bertahap.'],
+    ['Dialysis Disequilibrium Syndrome (DDS)','Sakit kepala, mual, kejang, penurunan kesadaran — terutama sesi pertama.','Hentikan HD, manitol 0,5 g/kg bolus IV, monitor GCS ketat, panggil dokter.','Protokol inisiasi lambat, profilaksis manitol bila BUN &gt;150.'],
+    ['Demam & Menggigil Intradialitik','Suhu ≥38°C atau kenaikan ≥1°C dari awal.','Cek suhu dialisat, kultur darah, parasetamol IV, antibiotik empiris bila syok.','Perawatan akses vaskular steril, desinfeksi mesin reguler.'],
+    ['Aritmia Kordis','Perubahan ritme, terkait gangguan elektrolit / penarikan cairan cepat.','EKG segera, cek elektrolit STAT, koreksi i.v., kurangi UF, konsul kardiologi.','Pantau EKG pre-HD, konsentrasi K dialisat 2–3 mEq/L.'],
+  ]);
+
+/* ===================== STATIC TABLES: REFERENSI CEPAT ===================== */
+buildTable('t-ref1',
+  ['BB (kg)','EBV (mL)','10% EBV (mL)','Qb Inisiasi (mL/mnt)','Qb Rutin (mL/mnt)','UFR Maks (mL/jam)'],
+  [
+    ['10','720','72','25','40–60','100'],
+    ['15','1080','108','38','60–90','150'],
+    ['20','1440','144','50','80–120','200'],
+    ['25','1800','180','63','100–150','250'],
+    ['30','2160','216','75','120–180','300'],
+    ['35','2520','252','88','140–210','350'],
+    ['40','2720','272','100','160–240','400'],
+    ['50','3400','340','125','200–300','500'],
+  ].map(r=>r.map((c,i)=>i>0?`<span class="num">${c}</span>`:c)));
+
+buildTable('t-ref2',
+  ['Berat Badan','Pilihan Nipro','Pilihan Fresenius','Priming (Nipro)','Priming (Fresenius)','Catatan Klinis'],
+  [
+    ['&lt;15 kg','Konsultasi — BL pediatrik khusus','Konsultasi','&lt;58 mL (BL Ped.)','&lt;82 mL (BL Ped.)','Wajib hitung ulang EBV. Priming PRC hampir selalu dibutuhkan.'],
+    ['15–25 kg','Elisio 110H (58 mL)','Konsultasi / BL Ped.','58+140=198 mL','82+145=227 mL','Cek 10% EBV dahulu. Jika melebihi → priming albumin 5%.'],
+    ['25–40 kg','Elisio 13H (76 mL)','F7 (82 mL)','76+140=216 mL','82+145=227 mL','Pilihan utama kedua vendor. Aman tanpa priming jika BB ≥28 kg.'],
+    ['40–55 kg','Elisio 15H (88 mL)','F7 / F8 pertimbangan','88+140=228 mL','112+145=257 mL','Remaja besar. F8 dengan pemantauan ketat UFR.'],
+    ['&gt;55 kg','Elisio 15H (88 mL)','F8 atau FX80','88+140=228 mL','112–113+145 mL','Mendekati dosis dewasa. Ikuti protokol dewasa dengan supervisi.'],
+  ]);
+
+buildTable('t-ref3',
+  ['Parameter','Target Inisiasi (Sesi 1–3)','Target Rutin','Konsekuensi jika Tidak Terpenuhi'],
+  [
+    ['URR','30–40%','≥65%','&lt;65% rutin → komorbiditas meningkat, rawat inap lebih sering.'],
+    ['Kt/V per sesi','0,6–0,9','≥1,2 (optimal 1,4)','&lt;1,2 → audit segera: durasi, Qb, akses, resirkulasi.'],
+    ['UFR','≤8 mL/kg/jam','≤10 mL/kg/jam','&gt;13 mL/kg/jam → hentikan atau kurangi UF target.'],
+    ['Durasi Sesi','1,5–2 jam','3–4 jam (3×/minggu)','Kurang waktu → Kt/V tidak tercapai.'],
+    ['Frekuensi','Harian (jika mungkin)','3×/minggu minimum','2×/minggu → Kt/V per sesi harus ≥1,8.'],
+  ]);
+
+/* ===================== PUSTAKA ===================== */
+buildTable('t-pustaka',['No.','Sumber / Referensi'],[
+  ['1','KDOQI Clinical Practice Guideline for Hemodialysis Adequacy: 2015 Update. Am J Kidney Dis. 2015;66(5):884-930. (Update rekomendasi pediatrik 2023)'],
+  ['2','Goldstein SL. Hemodialysis in the Pediatric Patient: State of the Art. Adv Chronic Kidney Dis. 2020;27(5):416-423.'],
+  ['3','National Kidney Foundation. KDOQI Clinical Practice Guidelines for Peritoneal Dialysis Adequacy. Pediatric ESRD supplement. 2022.'],
+  ['4','Fischbach M, Zaloszyc A, Menouer S. Optimal peritoneal dialysis and hemodialysis in children. Pediatr Nephrol. 2020;35:383-391.'],
+  ['5','Warady BA, Bakkaloglu S, Newland J, et al. Consensus guidelines for prevention/treatment of catheter-related infections. Perit Dial Int. 2012;32 Suppl 2:S32-86.'],
+  ['6','Daugirdas JT. Second generation logarithmic estimates of single-pool variable volume Kt/V. J Am Soc Nephrol. 1993;4(5):1205-1213.'],
+  ['7','Mosteller RD. Simplified calculation of body-surface area. N Engl J Med. 1987;317(17):1098.'],
+  ['8','Ikatan Dokter Anak Indonesia (IDAI). Panduan Praktik Klinis: Tata Laksana Gagal Ginjal Kronik pada Anak. Jakarta: IDAI; 2021.'],
+  ['9','Nipro Corporation. Elisio Series Dialyzer — Product Specification Sheet. Osaka: Nipro Medical Corporation; 2022.'],
+  ['10','Fresenius Medical Care. FX-series and F-series Dialyzer — Technical Data Sheet. Bad Homburg: Fresenius Medical Care AG; 2023.'],
+  ['11','Secker DJ, Baldridge D, Balfe JW. Renal replacement therapy in children: hemodialysis. In: Pediatric Nephrology. 7th ed. Heidelberg: Springer; 2016:2047-2078.'],
+  ['12','Bunchman TE, Gardner JJ, Kershaw DB. Preventing DDS in Critically Ill Pediatric Patients. Pediatr Nephrol. 2021;36:2997-3005.'],
+  ['13','Schaefer F, Warady BA. Peritoneal dialysis in children with end-stage renal disease. Nat Rev Nephrol. 2011;7:657-666.'],
+  ['14','ISPD Pediatric Guidelines 2012 & 2020 Update. Warady BA et al. Perit Dial Int. 2020.'],
+  ['15','Depkes RI / Kemenkes RI. Pedoman Pelayanan Hemodialisis di Sarana Pelayanan Kesehatan. Jakarta: Kemenkes RI; 2021.'],
+]);
+
+/* ===================== MONITORING CHECKLISTS (localStorage) ===================== */
+const preItems=[
+  ['BB aktual & BB kering','Timbang sebelum HD — catat selisih untuk hitung UFR. Jika selisih >5% BB → pertimbangkan perpanjang sesi.'],
+  ['Tekanan Darah Pra-HD','TD sistol >90 mmHg (anak). Jika hipotensi → tunda HD, beri cairan, evaluasi penyebab.'],
+  ['Denyut Nadi','HR 60–120 bpm sesuai usia. Bradikardia/takikardia simtomatik → konsul kardiologi.'],
+  ['Suhu Tubuh','36,5–37,5°C. Demam → kultur darah, pertimbangkan tunda HD bila septik.'],
+  ['Status Akses Vaskular','Inspeksi & palpasi AVF/CDL — bruit (+), thrill (+), tanpa tanda infeksi.'],
+  ['Hasil Lab Terbaru','BUN, Kreatinin, K⁺, Na⁺, Hb, iCa. Hiperkalemia berat (K⁺ &gt;6,5) → ECG dulu, koreksi sebelum HD.'],
+  ['Obat-obatan Pra-HD','Tunda antihipertensi bila TD &lt;100 mmHg.'],
+  ['Konfirmasi Priming Sirkuit','Jika vol. sirkuit &gt;10% EBV → wajib priming koloid/darah.'],
+  ['Setting Mesin','Qb awal, UFR, Qd, suhu dialisat 36–37°C, Qd 300–500 mL/mnt.'],
+];
+const postItems=[
+  ['BB Pasca-HD','Sesuai target BB kering ±0,5 kg. Jika &gt;target → edukasi pembatasan cairan.'],
+  ['Tekanan Darah Pasca-HD','TD sistol 100–140 mmHg setelah 10 menit istirahat.'],
+  ['Hemostasis Akses','Perdarahan berhenti &lt;10 menit. Jika &gt;15 menit → cek INR.'],
+  ['Dokumentasi Lab Post-HD','Ambil darah BUN Post dari jalur yang benar (bukan dari saline).'],
+  ['Edukasi Pasien & Orang Tua','Cairan, diet K⁺/P/Na⁺/protein — catat di rekam medis.'],
+  ['Dokumentasi Lembar HD','Lengkapi semua parameter sebelum pasien pulang.'],
+];
+
+function renderChecklist(containerId, items, storeKey){
+  const saved = JSON.parse(localStorage.getItem(storeKey)||'{}');
+  $(containerId).innerHTML = items.map((it,i)=>`
+    <label class="chk-row">
+      <input type="checkbox" data-key="${storeKey}-${i}" ${saved[i]?'checked':''}>
+      <span class="chk-text"><strong>${it[0]}</strong><span>${it[1]}</span></span>
+    </label>`).join('');
+  $(containerId).querySelectorAll('input[type=checkbox]').forEach((cb,i)=>{
+    cb.addEventListener('change',()=>{
+      const s = JSON.parse(localStorage.getItem(storeKey)||'{}');
+      s[i]=cb.checked;
+      localStorage.setItem(storeKey, JSON.stringify(s));
+    });
+  });
+}
+renderChecklist('chk-pre', preItems, 'hdanak-pre');
+renderChecklist('chk-post', postItems, 'hdanak-post');
+
+buildTable('t-intra',
+  ['Parameter','Menit 30','Menit 60','Menit 90 & 120','Tindakan'],
+  [
+    ['Tekanan Darah (mmHg)','Catat TD + HR','Catat TD + HR','Catat tiap 30 mnt s.d. selesai','TD turun &gt;20 mmHg dari awal → Trendelenburg + kurangi UFR.'],
+    ['Denyut Nadi (bpm)','Catat HR','Catat HR','Catat tiap 30 mnt','HR &gt;140 atau aritmia → rekam EKG.'],
+    ['Keluhan Subjektif','Nyeri kepala, mual','Gejala DDS','Kram, pusing','Gejala DDS → hentikan HD, beri manitol bolus.'],
+    ['Warna Darah di BL','Merah terang = OK','Cek tanda clotting','Cek tiap 30 mnt','Clotting → tambah heparin atau flush saline.'],
+    ['Alarm Mesin','TMP, AP, VP dalam batas','Semua alarm OK','Monitor alarm aktif','Alarm tak bisa di-reset → hentikan mesin, cari penyebab.'],
+    ['Saturasi O₂','SpO₂ ≥95%','SpO₂ ≥95%','SpO₂ ≥95%','SpO₂ &lt;92% → O₂ nasal kanul, konsul dokter.'],
+  ]);
+
+$('btn-reset-chk').addEventListener('click',()=>{
+  localStorage.removeItem('hdanak-pre');
+  localStorage.removeItem('hdanak-post');
+  renderChecklist('chk-pre', preItems, 'hdanak-pre');
+  renderChecklist('chk-post', postItems, 'hdanak-post');
+});
+
+/* ===================== SIGNATURE PADS ===================== */
+function initSignaturePad(canvas, onChange){
+  const ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#0c3a44';
+  ctx.lineWidth = 2.4;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  let drawing=false, empty=true;
+  function pos(e){
+    const rect = canvas.getBoundingClientRect();
+    const cx = (e.touches? e.touches[0].clientX : e.clientX) - rect.left;
+    const cy = (e.touches? e.touches[0].clientY : e.clientY) - rect.top;
+    return {x: cx*(canvas.width/rect.width), y: cy*(canvas.height/rect.height)};
+  }
+  function start(e){ drawing=true; empty=false; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); if(onChange) onChange(false); e.preventDefault(); }
+  function move(e){ if(!drawing) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); e.preventDefault(); }
+  function end(){ drawing=false; }
+  canvas.addEventListener('mousedown',start);
+  canvas.addEventListener('mousemove',move);
+  window.addEventListener('mouseup',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',move,{passive:false});
+  canvas.addEventListener('touchend',end);
+  return {
+    clear(){ ctx.clearRect(0,0,canvas.width,canvas.height); empty=true; if(onChange) onChange(true); },
+    isEmpty(){ return empty; },
+    toDataURL(){ return empty ? '' : canvas.toDataURL('image/png'); },
+    markEmpty(v){ empty=v; }
+  };
+}
+
+const padPerawat = initSignaturePad($('sigPerawat'), (isEmpty)=>{
+  const el=$('status-sig-perawat');
+  el.textContent = isEmpty ? 'Belum ditandatangani' : '✓ Sudah ditandatangani';
+  el.className = 'sig-status ' + (isEmpty?'empty':'ok');
+});
+$('btn-clear-perawat').addEventListener('click', ()=> padPerawat.clear());
+
+const padPeneliti = initSignaturePad($('sigPeneliti'));
+$('btn-clear-peneliti-pad').addEventListener('click', ()=> { padPeneliti.clear(); $('status-peneliti-setup').textContent=''; });
+
+function getPenelitiSignature(){ return localStorage.getItem('hdanak-sig-peneliti') || ''; }
+
+function refreshPenelitiPreview(){
+  const sig = getPenelitiSignature();
+  const wrap = $('peneliti-preview-wrap');
+  const statusEl = $('status-sig-peneliti');
+  if(sig){
+    wrap.innerHTML = `<img src="${sig}" class="sig-preview" alt="Tanda tangan peneliti">`;
+    statusEl.textContent = '✓ Tanda tangan peneliti aktif (otomatis diterapkan)';
+    statusEl.className = 'sig-status ok';
+  } else {
+    wrap.innerHTML = `<span class="muted" style="font-size:.82rem;">Belum diatur — buka tab <strong>Riwayat</strong> untuk mengatur tanda tangan ini sekali, akan otomatis dipakai di semua data.</span>`;
+    statusEl.textContent = '';
+  }
+}
+refreshPenelitiPreview();
+
+$('btn-save-peneliti').addEventListener('click', ()=>{
+  if(padPeneliti.isEmpty()){
+    $('status-peneliti-setup').textContent = '⚠ Coret tanda tangan dahulu sebelum menyimpan.';
+    $('status-peneliti-setup').className='sig-status empty';
+    return;
+  }
+  localStorage.setItem('hdanak-sig-peneliti', padPeneliti.toDataURL());
+  $('status-peneliti-setup').textContent = '✅ Tanda tangan peneliti disimpan & akan otomatis dipakai.';
+  $('status-peneliti-setup').className='sig-status ok';
+  refreshPenelitiPreview();
+});
+
+function getScriptUrl(){ return localStorage.getItem('hdanak-script-url') || ''; }
+$('scriptUrl').value = getScriptUrl();
+
+$('btn-save-url').addEventListener('click',()=>{
+  const url = $('scriptUrl').value.trim();
+  localStorage.setItem('hdanak-script-url', url);
+  setRiwayatMsg(url? 'URL tersimpan. Memuat riwayat…' : 'URL dikosongkan.');
+  if(url) fetchRiwayat();
+});
+
+function setRiwayatMsg(msg){
+  $('t-riwayat').querySelector('tbody').innerHTML = `<tr><td colspan="9" class="muted" style="text-align:center;padding:20px;">${msg}</td></tr>`;
+}
+
+let riwayatCache=[];
+
+async function fetchRiwayat(){
+  const url = getScriptUrl();
+  if(!url){ setRiwayatMsg('Belum ada koneksi. Masukkan URL Apps Script di atas.'); return; }
+  setRiwayatMsg('Memuat data…');
+  try{
+    const res = await fetch(url+'?action=list');
+    const data = await res.json();
+    riwayatCache = (data.records||[]).sort((a,b)=> (b.timestamp||'').localeCompare(a.timestamp||''));
+    renderRiwayatTable(riwayatCache);
+  }catch(err){
+    setRiwayatMsg('⚠ Gagal memuat data. Cek kembali URL Web App dan pastikan deployment "Anyone" punya akses.');
+  }
+}
+
+function renderRiwayatTable(records){
+  if(!records.length){ setRiwayatMsg('Belum ada data tersimpan.'); return; }
+  const q = ($('searchRiwayat').value||'').toLowerCase();
+  const filtered = records.filter(r=> (r.namaPasien||'').toLowerCase().includes(q) || (r.noRM||'').toLowerCase().includes(q));
+  if(!filtered.length){ setRiwayatMsg('Tidak ada hasil untuk pencarian tersebut.'); return; }
+  $('t-riwayat').querySelector('tbody').innerHTML = filtered.map(r=>`
+    <tr>
+      <td class="muted">${r.timestamp ? new Date(r.timestamp).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+      <td class="num">${r.noRM||'—'}</td>
+      <td class="kw">${r.namaPasien||'(tanpa nama)'}</td>
+      <td class="num">${fmt(r.bbAktual,1)} kg / ${fmt(r.usia,1)} th</td>
+      <td class="num">${fmt(r.ufrAktual,2)}</td>
+      <td class="num">${fmt(r.urr,1)}%</td>
+      <td class="num">${fmt(r.ktv,2)}</td>
+      <td class="muted">${r.namaPerawat||'—'}</td>
+      <td>
+        <button class="btn btn-ghost" style="padding:6px 10px;font-size:.74rem;" onclick="loadRiwayatRecord('${r.id}')">Muat</button>
+        <button class="btn btn-ghost" style="padding:6px 10px;font-size:.74rem;" onclick="viewRiwayatSignatures('${r.id}')">TTD</button>
+        <button class="btn btn-ghost" style="padding:6px 10px;font-size:.74rem;color:var(--red);border-color:#e3b3ab;" onclick="deleteRiwayatRecord('${r.id}')">Hapus</button>
+      </td>
+    </tr>`).join('');
+}
+
+window.viewRiwayatSignatures = function(id){
+  const r = riwayatCache.find(x=>x.id===id);
+  if(!r) return;
+  const w = window.open('', '_blank', 'width=480,height=420');
+  if(!w){ alert('Izinkan pop-up untuk melihat tanda tangan.'); return; }
+  w.document.write(`
+    <html><head><title>Tanda Tangan — ${r.namaPasien||''}</title>
+    <style>body{font-family:sans-serif;padding:20px;color:#142328;}h3{margin:18px 0 6px;font-size:.9rem;}img{max-width:100%;border:1px solid #ddd;border-radius:8px;background:#fff;}p.empty{color:#888;font-size:.85rem;}</style>
+    </head><body>
+    <h2 style="margin-bottom:0;">${r.namaPasien||'(tanpa nama)'} ${r.noRM?('— RM '+r.noRM):''}</h2>
+    <p style="color:#667;font-size:.82rem;margin-top:4px;">${r.timestamp? new Date(r.timestamp).toLocaleString('id-ID'):''}</p>
+    <h3>Tanda Tangan Perawat/Petugas (${r.namaPerawat||'-'})</h3>
+    ${r.signaturePerawat ? `<img src="${r.signaturePerawat}">` : '<p class="empty">Tidak ada tanda tangan tersimpan.</p>'}
+    <h3>Tanda Tangan Peneliti / Penanggung Jawab</h3>
+    ${r.signaturePeneliti ? `<img src="${r.signaturePeneliti}">` : '<p class="empty">Tidak ada tanda tangan tersimpan.</p>'}
+    </body></html>`);
+};
+
+$('searchRiwayat').addEventListener('input', ()=> renderRiwayatTable(riwayatCache));
+$('btn-refresh-riwayat').addEventListener('click', fetchRiwayat);
+
+window.loadRiwayatRecord = function(id){
+  const r = riwayatCache.find(x=>x.id===id);
+  if(!r) return;
+  const map={namaPasien:'namaPasien',noRM:'noRM',gender:'gender',bbAktual:'bbAktual',tb:'tb',bbKering:'bbKering',usia:'usia',
+    preBUN:'preBUN',postBUN:'postBUN',durasi:'durasi',frekuensi:'frekuensi',ufVol:'ufVol',sesiKe:'sesiKe'};
+  Object.entries(map).forEach(([k,id2])=>{ if(r[k]!==undefined && r[k]!=='') $(id2).value=r[k]; });
+  render();
+  document.querySelector('.tab-btn[data-tab="kalkulator"]').click();
+  setSaveStatus('Data "'+(r.namaPasien||'pasien')+'" dimuat dari riwayat ke form kalkulator.');
+};
+
+window.deleteRiwayatRecord = async function(id){
+  const url=getScriptUrl();
+  if(!url) return;
+  if(!confirm('Hapus data riwayat ini secara permanen?')) return;
+  try{
+    await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'delete',id})});
+    fetchRiwayat();
+  }catch(err){ alert('Gagal menghapus data. Cek koneksi.'); }
+};
+
+function setSaveStatus(msg){ $('save-status').textContent = msg; }
+
+$('btn-save-sheet').addEventListener('click', async ()=>{
+  const url = getScriptUrl();
+  if(!url){
+    setSaveStatus('⚠ Belum ada koneksi Google Sheets. Buka tab "Riwayat" untuk setup URL Apps Script.');
+    return;
+  }
+  if(padPerawat.isEmpty()){
+    setSaveStatus('⚠ Tanda tangan perawat/petugas wajib diisi sebelum menyimpan.');
+    document.querySelector('#sigPerawat').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  const noRM = $('noRM').value.trim();
+  const namaPasienVal = $('namaPasien').value.trim();
+  if(noRM){
+    const dup = riwayatCache.find(r => (r.noRM||'').trim()===noRM && (r.namaPasien||'').trim()!==namaPasienVal);
+    if(dup){
+      const lanjut = confirm(`No. RM "${noRM}" sudah tercatat sebelumnya atas nama "${dup.namaPasien}". Data yang akan disimpan ini atas nama "${namaPasienVal||'(tanpa nama)'}".\n\nKemungkinan No. RM tertukar / salah ketik. Tetap lanjut simpan?`);
+      if(!lanjut){ setSaveStatus('Penyimpanan dibatalkan — periksa kembali No. RM.'); return; }
+    }
+  }
+
+  const c = calculate();
+  const payload = {
+    action:'save',
+    id: 'rec_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+    timestamp: new Date().toISOString(),
+    noRM, namaPasien:c.namaPasien, gender:c.gender, bbAktual:c.bbAktual, tb:c.tb, bbKering:c.bbKering, usia:c.usia,
+    preBUN:c.preBUN, postBUN:c.postBUN, durasi:c.durasi, frekuensi:c.frekuensi, ufVol:c.ufVol, sesiKe:c.sesiKe,
+    bsa:c.bsa, ebv:c.ebv, ufrAktual:c.ufrAktual, statusUFR:c.ufrStatusTxt,
+    urr:c.urr, statusURR:c.urrStatusTxt, ktv:c.ktv, statusKtV:c.ktvTxt, ektv:c.ektv,
+    namaPerawat: $('namaPerawat').value.trim(),
+    signaturePerawat: padPerawat.toDataURL(),
+    signaturePeneliti: getPenelitiSignature()
+  };
+  setSaveStatus('Menyimpan…');
+  try{
+    await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+    setSaveStatus('✅ Tersimpan ke riwayat Google Sheets.');
+    padPerawat.clear();
+    fetchRiwayat();
+  }catch(err){
+    setSaveStatus('⚠ Gagal menyimpan. Cek URL Apps Script di tab Riwayat.');
+  }
+});
+
+if(getScriptUrl()) fetchRiwayat();
+
+</script>
+</body>
+</html>
