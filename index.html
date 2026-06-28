@@ -253,8 +253,34 @@ footer{
 .rp-table td{padding:6px 8px;border-bottom:1px solid #e2e2e2;}
 .rp-table td:first-child{font-weight:600;color:var(--ink-soft);width:46%;}
 .rp-table td:last-child{font-family:var(--mono);font-weight:700;}
+.rp-table tr.rp-highlight td{background:#fff4d6;}
+.rp-table tr.rp-highlight td:first-child{color:#8a5a00;}
+.rp-table tr.rp-highlight td:last-child{color:#8a5a00;}
 
 .disclaimer{font-size:.74rem;color:var(--ink-soft);margin-top:6px;font-style:italic;}
+
+/* Rekomendasi utama dializer — ditandai mencolok, beda dari status "aman" biasa */
+tr.row-rekomendasi-utama td{background:#fff1c2!important;}
+tr.row-rekomendasi-utama td:nth-child(2){position:relative;}
+.tag.rekomendasi-utama{
+  background:#ffb300;color:#3a2900;
+  box-shadow:0 0 0 1px #c98300 inset;
+}
+.note-rekomendasi-utama{
+  display:block;font-weight:800;color:#8a5a00;
+  background:#ffe08a;border-radius:6px;padding:4px 7px;margin-top:4px;
+  font-size:.78rem;
+}
+
+/* Tanda tangan pada lembar cetak ringkasan */
+.rp-sig-section{margin-top:18px;display:flex;gap:24px;flex-wrap:wrap;}
+.rp-sig-block{flex:1;min-width:220px;}
+.rp-sig-block .rp-sig-label{font-size:.78rem;font-weight:700;color:var(--ink-soft);margin-bottom:6px;}
+.rp-sig-block .rp-sig-imgwrap{border-bottom:1.5px solid var(--ink);height:70px;display:flex;align-items:flex-end;}
+.rp-sig-block img{max-height:68px;max-width:100%;object-fit:contain;}
+.rp-sig-block .rp-sig-name{font-size:.8rem;font-weight:700;margin-top:6px;text-align:center;}
+.rp-sig-block .rp-sig-role{font-size:.72rem;color:var(--ink-soft);text-align:center;}
+.rp-sig-empty{font-size:.78rem;color:var(--ink-soft);font-style:italic;}
 
 /* Signature pad */
 .sig-wrap{display:flex;gap:18px;flex-wrap:wrap;}
@@ -272,6 +298,8 @@ footer{
 .sig-preview{max-height:70px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:4px;}
 
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body>
 
@@ -375,6 +403,7 @@ footer{
     <div class="card" id="ringkasan-view"></div>
     <div class="btn-row">
       <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak / Simpan PDF Ringkasan</button>
+      <button class="btn btn-ghost" id="btn-export-excel">📊 Export Excel Ringkasan</button>
       <button class="btn btn-ghost" id="btn-save-sheet">☁️ Simpan ke Riwayat (Google Sheets)</button>
       <button class="btn btn-ghost" id="btn-reset">↺ Reset ke Contoh Awal</button>
     </div>
@@ -623,18 +652,22 @@ function renderDializerTable(calc){
     else if(pctEBV<=15){statusCls='flag-warn';statusTxt='⚠ Wajib priming koloid/albumin';}
     else {statusCls='flag-bad';statusTxt='🚨 Wajib priming PRC donor';}
     const inRange = calc.bbAktual>=d.range[0] && calc.bbAktual<d.range[1];
-    return `<tr style="${inRange?'background:var(--teal-100);':''}">
+    return `<tr class="${inRange?'row-rekomendasi-utama':''}">
       <td><span class="kw">${d.vendor}</span></td>
-      <td>${d.model}${inRange?' <span class="tag aman" style="margin-top:0;">BB sesuai</span>':''}</td>
+      <td>${d.model}${inRange?' <span class="tag rekomendasi-utama" style="margin-top:0;">⭐ REKOMENDASI UTAMA</span>':''}</td>
       <td class="num">${d.vol} mL</td>
       <td class="num">${d.bl} mL</td>
       <td class="num">${total} mL</td>
       <td class="num">${fmt(pctEBV,1)}%</td>
       <td class="${statusCls}">${statusTxt}</td>
-      <td class="muted">${d.note}</td>
+      <td class="muted">${inRange?`<span class="note-rekomendasi-utama">⭐ ${d.note}</span>`:d.note}</td>
     </tr>`;
   }).join('');
   return `<thead><tr><th>Vendor</th><th>Model Dializer</th><th>Vol. Dializer</th><th>Vol. BL (dewasa, est.)</th><th>Total Vol. Sirkuit</th><th>% EBV Pasien</th><th>Status</th><th>Catatan</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+function dializerRekomendasiUtama_(calc){
+  return dializerData.filter(d=> calc.bbAktual>=d.range[0] && calc.bbAktual<d.range[1]);
 }
 
 /* ===================== RENDER MAIN CALCULATOR ===================== */
@@ -680,6 +713,10 @@ function render(){
   ].join('');
 
   // Ringkasan G
+  const dRekList = dializerRekomendasiUtama_(c);
+  const dRekText = dRekList.length
+    ? dRekList.map(d=>`${d.vendor} ${d.model} — ${d.note}`).join('   /   ')
+    : 'Tidak ada model sesuai rentang BB — evaluasi ulang';
   const ringkasanRows = [
     ['Nama Pasien', c.namaPasien],
     ['BB / TB / Usia', `${fmt(c.bbAktual,1)} kg  /  ${fmt(c.tb,1)} cm  /  ${fmt(c.usia,1)} th`],
@@ -695,16 +732,37 @@ function render(){
     ['Heparin Bolus (standar)', `${fmt(c.hepBolusMin,0)} IU (25 IU/kg)`],
     ['Heparin Maintenance (standar)', `${fmt(c.hepMaintStd,0)} IU/jam (20 IU/kg/jam)`],
     ['Manitol Profilaksis', c.manitolNeeded?`${fmt(c.manitolDosis,1)} gram (BUN ≥150)`:'Tidak diperlukan'],
+    ['⭐ Dializer Rekomendasi Utama', dRekText, true],
   ];
-  $('ringkasan-view').innerHTML = `<table>${ringkasanRows.map(r=>`<tr><td style="font-weight:600;color:var(--ink-soft);width:46%;">${r[0]}</td><td class="num">${r[1]}</td></tr>`).join('')}</table>`;
+  $('ringkasan-view').innerHTML = `<table style="table-layout:fixed;width:100%;">${ringkasanRows.map(r=>`<tr${r[2]?' style="background:#fff1c2;"':''}><td style="font-weight:600;color:${r[2]?'#8a5a00':'var(--ink-soft)'};width:42%;">${r[0]}</td><td class="num" style="white-space:normal;word-break:break-word;${r[2]?'color:#8a5a00;':''}">${r[1]}</td></tr>`).join('')}</table>`;
 
   $('ringkasan-print').innerHTML = `
     <div class="rp-head">
       <div><h2>Ringkasan Peresepan Hemodialisis Anak</h2><p>Sistem KSO Nipro &amp; Fresenius · KDOQI Pediatric 2023</p></div>
       <p>Tanggal cetak: ${new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'})}</p>
     </div>
-    <table class="rp-table">${ringkasanRows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>
+    <table class="rp-table">${ringkasanRows.map(r=>`<tr${r[2]?' class="rp-highlight"':''}><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>
+    ${renderSignatureBlockForPrint_()}
     <p class="disclaimer">Dokumen ini dihasilkan oleh alat bantu klinis. Keputusan akhir peresepan HD tetap menjadi tanggung jawab dokter / tenaga medis terlatih.</p>
+  `;
+}
+
+function renderSignatureBlockForPrint_(){
+  const namaPerawat = ($('namaPerawat').value||'').trim();
+  const sigDataUrl = (typeof window.padPerawat!=='undefined' && window.padPerawat && !window.padPerawat.isEmpty()) ? window.padPerawat.toDataURL() : '';
+  return `
+    <div class="rp-sig-section">
+      <div class="rp-sig-block">
+        <div class="rp-sig-label">Tanda Tangan Perawat / Petugas Jaga</div>
+        ${sigDataUrl
+          ? `<div class="rp-sig-imgwrap"><img src="${sigDataUrl}" alt="Tanda tangan perawat"></div>
+             <div class="rp-sig-name">${namaPerawat||'—'}</div>
+             <div class="rp-sig-role">Perawat / Petugas Jaga</div>`
+          : `<div class="rp-sig-imgwrap"></div>
+             <div class="rp-sig-empty">Belum ditandatangani — tanda tangani di bagian "Tanda Tangan Validasi" sebelum mencetak.</div>`
+        }
+      </div>
+    </div>
   `;
 }
 
@@ -916,7 +974,7 @@ function initSignaturePad(canvas, onChange){
   }
   function start(e){ drawing=true; empty=false; const p=pos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); if(onChange) onChange(false); e.preventDefault(); }
   function move(e){ if(!drawing) return; const p=pos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); e.preventDefault(); }
-  function end(){ drawing=false; }
+  function end(){ if(drawing && onChange) onChange(false); drawing=false; }
   canvas.addEventListener('mousedown',start);
   canvas.addEventListener('mousemove',move);
   window.addEventListener('mouseup',end);
@@ -931,12 +989,15 @@ function initSignaturePad(canvas, onChange){
   };
 }
 
-const padPerawat = initSignaturePad($('sigPerawat'), (isEmpty)=>{
+window.padPerawat = initSignaturePad($('sigPerawat'), (isEmpty)=>{
   const el=$('status-sig-perawat');
   el.textContent = isEmpty ? 'Belum ditandatangani' : '✓ Sudah ditandatangani';
   el.className = 'sig-status ' + (isEmpty?'empty':'ok');
+  render();
 });
+const padPerawat = window.padPerawat;
 $('btn-clear-perawat').addEventListener('click', ()=> padPerawat.clear());
+$('namaPerawat').addEventListener('input', render);
 
 const padPeneliti = initSignaturePad($('sigPeneliti'));
 $('btn-clear-peneliti-pad').addEventListener('click', ()=> { padPeneliti.clear(); $('status-peneliti-setup').textContent=''; });
@@ -1111,6 +1172,164 @@ $('btn-save-sheet').addEventListener('click', async ()=>{
     setSaveStatus('⚠ Gagal menyimpan. Cek URL Apps Script di tab Riwayat.');
   }
 });
+
+/* ===================== EXPORT EXCEL — RINGKASAN G ===================== */
+$('btn-export-excel').addEventListener('click', async ()=>{
+  const btn = $('btn-export-excel');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Menyiapkan file Excel…';
+  try{
+    await exportRingkasanToExcel_();
+  }catch(err){
+    alert('Gagal membuat file Excel: '+(err && err.message ? err.message : err));
+  }finally{
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+});
+
+async function exportRingkasanToExcel_(){
+  const c = calculate();
+  const dRekList = dializerRekomendasiUtama_(c);
+  const dRekText = dRekList.length
+    ? dRekList.map(d=>`${d.vendor} ${d.model} — ${d.note}`).join('   /   ')
+    : 'Tidak ada model sesuai rentang BB — evaluasi ulang';
+  const namaPerawat = ($('namaPerawat').value||'').trim();
+  const namaPasienVal = (c.namaPasien||'').trim();
+
+  const ringkasanRows = [
+    ['Nama Pasien', c.namaPasien || '—', false],
+    ['BB / TB / Usia', `${fmt(c.bbAktual,1)} kg  /  ${fmt(c.tb,1)} cm  /  ${fmt(c.usia,1)} th`, false],
+    ['BSA (Mosteller)', `${fmt(c.bsa,2)} m²`, false],
+    ['EBV / Batas 10% EBV', `${fmt(c.ebv,0)} mL  /  ${fmt(c.ebv10,0)} mL`, false],
+    ['Qb Inisiasi', `${fmt(c.qbInisiasi,0)} mL/mnt`, false],
+    ['Qb Rutin (min–maks)', `${fmt(c.qbRutinMin,0)} – ${fmt(c.qbRutinMax,0)} mL/mnt`, false],
+    ['UFR Aktual / Status', `${fmt(c.ufrAktual,2)} mL/kg/jam — ${c.ufrStatusTxt}`, false],
+    ['Batas Maks UF (10 mL/kg/jam)', `${fmt(c.ufrMaksAman,0)} mL`, false],
+    ['URR / Status', `${fmt(c.urr,1)}% — ${c.urrStatusTxt}`, false],
+    ['Kt/V (Daugirdas Gen.2) / Status', `${fmt(c.ktv,3)} — ${c.ktvTxt}`, false],
+    ['eKt/V Mingguan', `${fmt(c.ektv,2)} (target ≥3,6 untuk 3×/mgg)`, false],
+    ['Heparin Bolus (standar)', `${fmt(c.hepBolusMin,0)} IU (25 IU/kg)`, false],
+    ['Heparin Maintenance (standar)', `${fmt(c.hepMaintStd,0)} IU/jam (20 IU/kg/jam)`, false],
+    ['Manitol Profilaksis', c.manitolNeeded?`${fmt(c.manitolDosis,1)} gram (BUN ≥150)`:'Tidak diperlukan', false],
+    ['⭐ Dializer Rekomendasi Utama', dRekText, true],
+  ];
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Kalkulator HD Anak — RSUD Welas Asih';
+  wb.created = new Date();
+  const ws = wb.addWorksheet('Ringkasan Peresepan', { pageSetup:{ paperSize:9, orientation:'portrait', fitToPage:true, fitToWidth:1 } });
+
+  ws.columns = [
+    { width: 4 },
+    { width: 34 },
+    { width: 46 },
+  ];
+
+  // --- Judul ---
+  ws.mergeCells('B1:C1');
+  const titleCell = ws.getCell('B1');
+  titleCell.value = 'Ringkasan Peresepan Hemodialisis Anak';
+  titleCell.font = { name:'Calibri', size:14, bold:true, color:{argb:'FF0C3A44'} };
+  ws.getRow(1).height = 24;
+
+  ws.mergeCells('B2:C2');
+  const subCell = ws.getCell('B2');
+  subCell.value = 'Sistem KSO Nipro & Fresenius · KDOQI Pediatric 2023';
+  subCell.font = { name:'Calibri', size:10, italic:true, color:{argb:'FF4D6066'} };
+
+  ws.mergeCells('B3:C3');
+  const tglCell = ws.getCell('B3');
+  tglCell.value = 'Tanggal cetak: ' + new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+  tglCell.font = { name:'Calibri', size:9, color:{argb:'FF4D6066'} };
+  ws.addRow([]);
+
+  // --- Header tabel ---
+  const headerRowIdx = 5;
+  const headerRow = ws.getRow(headerRowIdx);
+  headerRow.getCell(2).value = 'Parameter';
+  headerRow.getCell(3).value = 'Nilai';
+  [2,3].forEach(col=>{
+    const cell = headerRow.getCell(col);
+    cell.font = { name:'Calibri', size:10, bold:true, color:{argb:'FFFFFFFF'} };
+    cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FF0F4C5C'} };
+    cell.alignment = { vertical:'middle' };
+  });
+  headerRow.height = 20;
+
+  // --- Isi tabel ringkasan ---
+  let rowIdx = headerRowIdx + 1;
+  ringkasanRows.forEach(([label, value, isHighlight])=>{
+    const row = ws.getRow(rowIdx);
+    row.getCell(2).value = label;
+    row.getCell(3).value = value;
+    row.getCell(2).alignment = { wrapText:true, vertical:'middle' };
+    row.getCell(3).alignment = { wrapText:true, vertical:'middle' };
+    row.getCell(2).font = { name:'Calibri', size:10, bold:true, color:{argb: isHighlight? 'FF8A5A00':'FF4D6066'} };
+    row.getCell(3).font = { name:'Calibri', size:10, bold:isHighlight, color:{argb: isHighlight? 'FF8A5A00':'FF142328'} };
+    if(isHighlight){
+      [2,3].forEach(col=>{
+        row.getCell(col).fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFFFE08A'} };
+        row.getCell(col).border = { top:{style:'thin',color:{argb:'FFC98300'}}, bottom:{style:'thin',color:{argb:'FFC98300'}} };
+      });
+    } else {
+      [2,3].forEach(col=>{
+        row.getCell(col).border = { bottom:{style:'hair',color:{argb:'FFE2E2E2'}} };
+      });
+    }
+    rowIdx++;
+  });
+
+  ws.addRow([]);
+  rowIdx++;
+
+  // --- Tanda tangan perawat / petugas jaga ---
+  const sigLabelRow = ws.getRow(rowIdx);
+  sigLabelRow.getCell(2).value = 'Tanda Tangan Perawat / Petugas Jaga';
+  sigLabelRow.getCell(2).font = { name:'Calibri', size:10, bold:true, color:{argb:'FF4D6066'} };
+  rowIdx++;
+
+  const sigDataUrl = (window.padPerawat && !window.padPerawat.isEmpty()) ? window.padPerawat.toDataURL() : '';
+  if(sigDataUrl){
+    const base64 = sigDataUrl.split(',')[1];
+    const imageId = wb.addImage({ base64: base64, extension: 'png' });
+    const imgRowStart = rowIdx;
+    ws.addImage(imageId, {
+      tl: { col: 1, row: imgRowStart - 1 },
+      ext: { width: 240, height: 90 }
+    });
+    for(let i=0;i<5;i++) ws.getRow(rowIdx+i).height = 18;
+    rowIdx += 5;
+    const nameRow = ws.getRow(rowIdx);
+    nameRow.getCell(2).value = namaPerawat || '—';
+    nameRow.getCell(2).font = { name:'Calibri', size:10, bold:true };
+    rowIdx++;
+    const roleRow = ws.getRow(rowIdx);
+    roleRow.getCell(2).value = 'Perawat / Petugas Jaga';
+    roleRow.getCell(2).font = { name:'Calibri', size:9, italic:true, color:{argb:'FF4D6066'} };
+    rowIdx++;
+  } else {
+    const emptyRow = ws.getRow(rowIdx);
+    emptyRow.getCell(2).value = 'Belum ditandatangani — tanda tangani di bagian "Tanda Tangan Validasi" sebelum export.';
+    emptyRow.getCell(2).font = { name:'Calibri', size:9, italic:true, color:{argb:'FF4D6066'} };
+    emptyRow.getCell(2).alignment = { wrapText:true };
+    rowIdx++;
+  }
+
+  ws.addRow([]);
+  rowIdx++;
+  ws.mergeCells(`B${rowIdx}:C${rowIdx}`);
+  const disclaimerCell = ws.getCell(`B${rowIdx}`);
+  disclaimerCell.value = 'Dokumen ini dihasilkan oleh alat bantu klinis. Keputusan akhir peresepan HD tetap menjadi tanggung jawab dokter / tenaga medis terlatih.';
+  disclaimerCell.font = { name:'Calibri', size:8, italic:true, color:{argb:'FF4D6066'} };
+  disclaimerCell.alignment = { wrapText:true };
+
+  const buffer = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buffer], { type:'application/octet-stream' });
+  const safeName = (namaPasienVal||'pasien').replace(/[^a-z0-9]+/gi,'_').toLowerCase();
+  saveAs(blob, `ringkasan-hd-anak_${safeName}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
 
 if(getScriptUrl()) fetchRiwayat();
 
